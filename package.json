@@ -1,0 +1,19 @@
+{
+  "name": "mutliplayerai-backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "install:all": "npm --prefix server ci && npm --prefix durable-object-starter ci",
+    "dev:gateway": "npm --prefix server run dev",
+    "dev:worker": "npm --prefix durable-object-starter run dev -- --port 8791 --persist-to .wrangler/terse-reference",
+    "check:gateway": "npm --prefix server run typecheck",
+    "check:worker": "durable-object-starter/node_modules/.bin/tsc --noEmit --project durable-object-starter/tsconfig.json",
+    "check": "npm run check:gateway && npm run check:worker",
+    "test": "npm --prefix server test && npm --prefix durable-object-starter test",
+    "deploy:worker": "npm --prefix durable-object-starter run deploy"
+  }
+}

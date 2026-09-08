@@ -1,0 +1,24 @@
+{
+  "name": "durable-object-starter",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "start": "wrangler dev",
+    "cf-typegen": "wrangler types",
+    "test": "node --import tsx --test test/*.test.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^26.4.0",
+    "tsx": "^4.23.13",
+    "typescript": "^5.5.2",
+    "wrangler": "^4.127.1"
+  },
+  "dependencies": {
+    "@composio/core": "^0.18.0",
+    "@earendil-works/pi-agent-core": "^0.85.1",
+    "@earendil-works/pi-ai": "^0.85.1",
+    "hono": "^4.13.7"
+  }
+}
