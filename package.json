@@ -15,5 +15,6 @@
     "check": "npm run check:gateway && npm run check:worker",
     "test": "npm --prefix server test && npm --prefix durable-object-starter test",
     "deploy:worker": "npm --prefix durable-object-starter run deploy"
-  }
+  },
+  "license": "MIT"
 }
