@@ -17,6 +17,7 @@
   "dependencies": {
     "@composio/core": "^0.18.0",
     "express": "^5.2.1",
+    "terse-sdk": "file:../../ai-product-owner/packages/terse-sdk",
     "zod": "^4.5.4"
   },
   "engines": {
