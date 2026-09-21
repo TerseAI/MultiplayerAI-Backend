@@ -4,13 +4,21 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "dev": "tsc --watch"
+    "dev": "tsc --watch",
+    "test:capabilities": "node --test test/runtime-capabilities.test.mjs",
+    "test": "node --import tsx --test test/*.test.ts"
   },
   "dependencies": {
     "terse-sdk": "0.6.0",
-    "zod": "^4.3.6"
+    "zod": "^4.3.6",
+    "@composio/core": "0.18.0",
+    "@earendil-works/pi-agent-core": "0.85.1",
+    "@earendil-works/pi-ai": "0.85.1"
   },
   "devDependencies": {
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "@types/node": "26.4.0",
+    "tsx": "4.23.13",
+    "little-actors": "link:../../little-durable-objects/sdk"
   }
 }
