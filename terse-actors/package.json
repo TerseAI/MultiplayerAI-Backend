@@ -9,7 +9,7 @@
     "test": "node --import tsx --test test/*.test.ts"
   },
   "dependencies": {
-    "terse-sdk": "0.6.0",
+    "terse-sdk": "link:../../ai-product-owner/packages/terse-sdk",
     "zod": "^4.3.6",
     "@composio/core": "0.18.0",
     "@earendil-works/pi-agent-core": "0.85.1",

@@ -2,11 +2,25 @@
 
 Standalone backend extracted from `mutliplayer-agent`.
 
-- `server/`: Node gateway/proxy, agent catalog, integrations, image storage, and Cloudflare adapter.
+- `server/`: Node gateway/proxy, agent catalog, integrations, image storage, and Cloudflare/Terse adapters.
 - `durable-object-starter/`: Cloudflare Worker and per-agent Durable Objects for presence, collaborative prompts, and streaming chat.
 - `shared/`: integration types used by the gateway, copied from the client project.
 
-## Local development
+## Local Terse development
+
+With `little-durable-objects`, `ai-product-owner`, and this repo next to each other, run:
+
+```sh
+npm run dev:terse
+```
+
+This links and builds the local SDK/runtime, starts Terse on port 7100, regenerates the `Agent` client, and starts the gateway on port 8790. Your frontend keeps using `http://127.0.0.1:8790`. Ctrl+C stops both services; actor source edits reload automatically. Restart this command after changing the actor's public API to regenerate the gateway client.
+
+The launcher sets `DURABLE_OBJECT_BINARY`, `TERSE_ACTOR_URL`, `TERSE_API_KEY`, and `ACTOR_BACKEND=terse` for its child processes. No global `npm link` or manual credential copying is needed. It reads `server/.env`, then `durable-object-starter/.dev.vars`, then `terse-actors/.env`; later files override earlier ones, and existing shell variables take precedence. Provider keys are kept in these existing ignored files. Set `OPEN_ROUTER_API_KEY` for live prompts and `COMPOSIO_API_KEY` when using tools.
+
+Prerequisites are Node.js 22.13+, Bun, pnpm, Rust, and installed dependencies in the three checkouts. `TERSE_REPO` and `LITTLE_ACTORS_REPO` can override the sibling repository locations. `PORT` overrides the gateway port; `TERSE_RUNTIME_PORT` overrides 7100. Terse local state is separate from Wrangler state.
+
+## Cloudflare local development
 
 Requires Node.js 22.13 or newer (Node 24 recommended).
 

@@ -11,6 +11,7 @@ import express, {
 } from "express";
 import type { AgentBackend } from "./backend.js";
 import { CloudflareDurableObjectBackend } from "./cloudflare-backend.js";
+import { createTerseBackend } from "./terse-backend.js";
 import { LocalImageStore, MAX_IMAGE_BYTES } from "./image-store.js";
 
 // This is a very important part of the architecture. These routes NEED to handle the security and authorization of requests going to the Durable Object.
@@ -20,9 +21,12 @@ import { LocalImageStore, MAX_IMAGE_BYTES } from "./image-store.js";
 
 const port = Number(process.env.PORT ?? 8790);
 const host = process.env.HOST ?? "127.0.0.1";
-const internalSecret = requiredSetting("TERSE_INTERNAL_SECRET", "terse_internal_dev");
 const workerURL = new URL(process.env.DURABLE_WORKFLOW_URL ?? "http://127.0.0.1:8791");
-const backend: AgentBackend = new CloudflareDurableObjectBackend(workerURL, internalSecret);
+const actorBackend = process.env.ACTOR_BACKEND ?? "cloudflare";
+if (!["terse", "cloudflare"].includes(actorBackend)) throw new Error("ACTOR_BACKEND must be terse or cloudflare");
+const backend: AgentBackend = actorBackend === "terse"
+  ? createTerseBackend()
+  : new CloudflareDurableObjectBackend(workerURL, requiredSetting("TERSE_INTERNAL_SECRET", "terse_internal_dev"));
 // I am sure you are doing something here for image storing, we should re-use that.
 const images = new LocalImageStore();
 const agents = new AgentStore();
@@ -362,7 +366,7 @@ const server = app.listen(port, host, (error) => {
   if (error) throw error;
   const address = server.address();
   console.log(`Terse gateway ready on http://${host}:${typeof address === "object" && address ? address.port : port}`);
-  console.log(`Backend: ${workerURL.origin}`);
+  console.log(`Backend: ${actorBackend === "terse" ? process.env.TERSE_ACTOR_URL : workerURL.origin}`);
 });
 
 function requiredSetting(name: string, developmentDefault: string): string {

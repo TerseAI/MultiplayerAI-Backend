@@ -13,28 +13,124 @@ import type { ActorRpcTransport, ProxyActor, SocketGrant } from "terse-sdk/actor
 /**
  * Types for actor state and socket messages.
  * @example
- * type State = actors.Counter.State
+ * type State = actors.Agent.State
  */
 export declare namespace actors {
-    export namespace Counter {
-        export interface Metadata {
-            userId: string
-        }
+    export namespace Agent {
+        export type Metadata = EventSocketAttachment
 
-        export interface Incoming {
-            by: number
-        }
+        export type Incoming = never
 
-        export interface Outgoing {
-            count: number
-        }
+        export type Outgoing = AgentEvent
 
-        export interface State {
-            count: number
+        export interface State {}
+
+        export type AgentEvent =
+            | {
+                  messages: {
+                      attachments?: {
+                          id: string
+                          mimeType: "image/gif" | "image/jpeg" | "image/png" | "image/webp"
+                          name: string
+                          size: number
+                          type: "image"
+                          url: string
+                      }[]
+                      author: string
+                      createdAt: number
+                      id: string
+                      reasoning?: string
+                      role: "assistant" | "user"
+                      status: "complete" | "failed" | "streaming"
+                      text: string
+                  }[]
+                  type: "history"
+              }
+            | {
+                  type: "connected_users"
+                  users: {
+                      connectedAt: number
+                      connectionId: string
+                      name: string
+                  }[]
+              }
+            | {
+                  lock: {
+                      expiresAt: number
+                      leaseId: string
+                      startedAt: number
+                      user: {
+                          connectedAt: number
+                          connectionId: string
+                          name: string
+                      }
+                  } | null
+                  type: "composer_lock"
+              }
+            | {
+                  draft: {
+                      attachments: {
+                          id: string
+                          mimeType: "image/gif" | "image/jpeg" | "image/png" | "image/webp"
+                          name: string
+                          size: number
+                          type: "image"
+                          url: string
+                      }[]
+                      leaseId: null | string
+                      sequence: number
+                      text: string
+                      updatedAt: number
+                  }
+                  type: "composer_draft"
+              }
+            | {
+                  attachments: {
+                      id: string
+                      mimeType: "image/gif" | "image/jpeg" | "image/png" | "image/webp"
+                      name: string
+                      size: number
+                      type: "image"
+                      url: string
+                  }[]
+                  createdAt: number
+                  generationId: string
+                  prompt: string
+                  type: "generation_started"
+                  user: {
+                      connectedAt: number
+                      connectionId: string
+                      name: string
+                  }
+              }
+            | {
+                  delta: string
+                  generationId: string
+                  type: "reasoning_delta"
+              }
+            | {
+                  delta: string
+                  generationId: string
+                  type: "text_delta"
+              }
+            | {
+                  generationId: string
+                  reasoning: string
+                  text: string
+                  type: "generation_completed"
+              }
+            | {
+                  generationId: string
+                  message: string
+                  type: "generation_failed"
+              }
+
+        export interface EventSocketAttachment {
+            connectionId: null | string
         }
 
         export interface Authorization {
-            actorName: "Counter"
+            actorName: "Agent"
             actorId: string
             metadata: Metadata
             clientLocation?: { latitude: number; longitude: number }
@@ -46,33 +142,397 @@ export declare namespace actors {
 /**
  * Types for actor state and methods.
  * @example
- * type State = actors.Counter.State
+ * type State = actors.Agent.State
  */
 export declare namespace actors {
-    export namespace Counter {
-        export type IncrementBy = number
+    export namespace Agent {
+        export type AcquirePromptLockConnectionId = string
 
-        export type IncrementResult = number
+        export type AcquirePromptLockLeaseId = string
+
+        export type AcquirePromptLockStartedAt = number
+
+        export type ClearHistoryResult = string[]
+
+        export type ConfigureToolsComposioSessionId = string
+
+        export type ConfigureToolsEnabledTools = string[]
+
+        export type ConnectUserName = string
+
+        export type DisconnectUserConnectionId = string
+
+        export type ExecuteToolTool = string
+
+        export type GetConnectedUsersResult = ConnectedUser2[]
+
+        export type AgentEventData =
+            | {
+                  messages: {
+                      attachments?: {
+                          id: string
+                          mimeType: "image/gif" | "image/jpeg" | "image/png" | "image/webp"
+                          name: string
+                          size: number
+                          type: "image"
+                          url: string
+                      }[]
+                      author: string
+                      createdAt: number
+                      id: string
+                      reasoning?: string
+                      role: "assistant" | "user"
+                      status: "complete" | "failed" | "streaming"
+                      text: string
+                  }[]
+                  type: "history"
+              }
+            | {
+                  type: "connected_users"
+                  users: {
+                      connectedAt: number
+                      connectionId: string
+                      name: string
+                  }[]
+              }
+            | {
+                  lock: {
+                      expiresAt: number
+                      leaseId: string
+                      startedAt: number
+                      user: {
+                          connectedAt: number
+                          connectionId: string
+                          name: string
+                      }
+                  } | null
+                  type: "composer_lock"
+              }
+            | {
+                  draft: {
+                      attachments: {
+                          id: string
+                          mimeType: "image/gif" | "image/jpeg" | "image/png" | "image/webp"
+                          name: string
+                          size: number
+                          type: "image"
+                          url: string
+                      }[]
+                      leaseId: null | string
+                      sequence: number
+                      text: string
+                      updatedAt: number
+                  }
+                  type: "composer_draft"
+              }
+            | {
+                  attachments: {
+                      id: string
+                      mimeType: "image/gif" | "image/jpeg" | "image/png" | "image/webp"
+                      name: string
+                      size: number
+                      type: "image"
+                      url: string
+                  }[]
+                  createdAt: number
+                  generationId: string
+                  prompt: string
+                  type: "generation_started"
+                  user: {
+                      connectedAt: number
+                      connectionId: string
+                      name: string
+                  }
+              }
+            | {
+                  delta: string
+                  generationId: string
+                  type: "reasoning_delta"
+              }
+            | {
+                  delta: string
+                  generationId: string
+                  type: "text_delta"
+              }
+            | {
+                  generationId: string
+                  reasoning: string
+                  text: string
+                  type: "generation_completed"
+              }
+            | {
+                  generationId: string
+                  message: string
+                  type: "generation_failed"
+              }
+
+        export type GetSnapshotResult = AgentEventData[]
+
+        export type GetToolConfigResult = {
+            composioSessionId: string
+            enabledTools: string[]
+            updatedAt: number
+        } | null
+
+        export type HeartbeatUserConnectionId = string
+
+        export type ReleasePromptLockConnectionId = string
+
+        export type ReleasePromptLockLeaseId = string
+
+        export type SendPromptPrompt = string
+
+        export type SendPromptConnectionId = string
+
+        export type SendPromptComposerLeaseId = string
+
+        export type PromptImageAttachment = {
+            id: string
+            mimeType: "image/gif" | "image/jpeg" | "image/png" | "image/webp"
+            name: string
+            size: number
+            type: "image"
+            url: string
+        } & {
+            dataUrl: string
+        }
+
+        export type SendPromptAttachments = PromptImageAttachment[]
+
+        export type SendPromptResult = string
+
+        export type UpdatePromptDraftConnectionId = string
+
+        export type UpdatePromptDraftLeaseId = string
+
+        export type UpdatePromptDraftText = string
+
+        export type UpdatePromptDraftSequence = number
+
+        export type UpdatePromptDraftAttachments = ImageAttachment[]
+
+        export interface ComposerLock {
+            expiresAt: number
+            leaseId: string
+            startedAt: number
+            user: ConnectedUser
+        }
+
+        export interface ConnectedUser {
+            connectedAt: number
+            connectionId: string
+            name: string
+        }
+
+        export interface AgentToolConfig {
+            composioSessionId: string
+            enabledTools: string[]
+            updatedAt: number
+        }
+
+        export interface ConnectedUser1 {
+            connectedAt: number
+            connectionId: string
+            name: string
+        }
+
+        export interface ExecuteToolArguments_ {}
+
+        export interface AgentToolExecution {
+            data: Type0
+            logId: string
+            tool: string
+        }
+
+        export interface Type0 {}
+
+        export interface ConnectedUser2 {
+            connectedAt: number
+            connectionId: string
+            name: string
+        }
+
+        export interface AgentConfiguration {
+            composioSessionId: string
+            enabledTools: string[]
+            systemPrompt: string
+        }
+
+        export interface ImageAttachment {
+            id: string
+            mimeType: "image/gif" | "image/jpeg" | "image/png" | "image/webp"
+            name: string
+            size: number
+            type: "image"
+            url: string
+        }
+
+        export interface ComposerDraft {
+            attachments: ImageAttachment1[]
+            leaseId: null | string
+            sequence: number
+            text: string
+            updatedAt: number
+        }
+
+        export interface ImageAttachment1 {
+            id: string
+            mimeType: "image/gif" | "image/jpeg" | "image/png" | "image/webp"
+            name: string
+            size: number
+            type: "image"
+            url: string
+        }
         export interface Stub {
-            increment(by?: IncrementBy): Promise<IncrementResult>
+            acquirePromptLock(
+                connectionId: AcquirePromptLockConnectionId,
+                leaseId: AcquirePromptLockLeaseId,
+                startedAt: AcquirePromptLockStartedAt
+            ): Promise<ComposerLock>
+            clearHistory(): Promise<ClearHistoryResult>
+            configureTools(
+                composioSessionId: ConfigureToolsComposioSessionId,
+                enabledTools: ConfigureToolsEnabledTools
+            ): Promise<AgentToolConfig>
+            connectUser(name: ConnectUserName): Promise<ConnectedUser1>
+            disconnectUser(connectionId: DisconnectUserConnectionId): Promise<void>
+            executeTool(tool: ExecuteToolTool, arguments_: ExecuteToolArguments_): Promise<AgentToolExecution>
+            getConnectedUsers(): Promise<GetConnectedUsersResult>
+            getSnapshot(): Promise<GetSnapshotResult>
+            getToolConfig(): Promise<GetToolConfigResult>
+            heartbeatUser(connectionId: HeartbeatUserConnectionId): Promise<void>
+            releasePromptLock(
+                connectionId: ReleasePromptLockConnectionId,
+                leaseId?: ReleasePromptLockLeaseId
+            ): Promise<void>
+            sendPrompt(
+                prompt: SendPromptPrompt,
+                connectionId?: SendPromptConnectionId,
+                composerLeaseId?: SendPromptComposerLeaseId,
+                attachments?: SendPromptAttachments,
+                configuration?: AgentConfiguration
+            ): Promise<SendPromptResult>
+            updatePromptDraft(
+                connectionId: UpdatePromptDraftConnectionId,
+                leaseId: UpdatePromptDraftLeaseId,
+                text: UpdatePromptDraftText,
+                sequence: UpdatePromptDraftSequence,
+                attachments?: UpdatePromptDraftAttachments
+            ): Promise<ComposerDraft>
         }
         interface $MethodTypes {
-            ["increment"]: {
-                Args: Parameters<Stub["increment"]>
-                Result: Awaited<ReturnType<Stub["increment"]>>
+            ["acquirePromptLock"]: {
+                Args: Parameters<Stub["acquirePromptLock"]>
+                Result: Awaited<ReturnType<Stub["acquirePromptLock"]>>
+            }
+            ["clearHistory"]: {
+                Args: Parameters<Stub["clearHistory"]>
+                Result: Awaited<ReturnType<Stub["clearHistory"]>>
+            }
+            ["configureTools"]: {
+                Args: Parameters<Stub["configureTools"]>
+                Result: Awaited<ReturnType<Stub["configureTools"]>>
+            }
+            ["connectUser"]: {
+                Args: Parameters<Stub["connectUser"]>
+                Result: Awaited<ReturnType<Stub["connectUser"]>>
+            }
+            ["disconnectUser"]: {
+                Args: Parameters<Stub["disconnectUser"]>
+                Result: Awaited<ReturnType<Stub["disconnectUser"]>>
+            }
+            ["executeTool"]: {
+                Args: Parameters<Stub["executeTool"]>
+                Result: Awaited<ReturnType<Stub["executeTool"]>>
+            }
+            ["getConnectedUsers"]: {
+                Args: Parameters<Stub["getConnectedUsers"]>
+                Result: Awaited<ReturnType<Stub["getConnectedUsers"]>>
+            }
+            ["getSnapshot"]: {
+                Args: Parameters<Stub["getSnapshot"]>
+                Result: Awaited<ReturnType<Stub["getSnapshot"]>>
+            }
+            ["getToolConfig"]: {
+                Args: Parameters<Stub["getToolConfig"]>
+                Result: Awaited<ReturnType<Stub["getToolConfig"]>>
+            }
+            ["heartbeatUser"]: {
+                Args: Parameters<Stub["heartbeatUser"]>
+                Result: Awaited<ReturnType<Stub["heartbeatUser"]>>
+            }
+            ["releasePromptLock"]: {
+                Args: Parameters<Stub["releasePromptLock"]>
+                Result: Awaited<ReturnType<Stub["releasePromptLock"]>>
+            }
+            ["sendPrompt"]: {
+                Args: Parameters<Stub["sendPrompt"]>
+                Result: Awaited<ReturnType<Stub["sendPrompt"]>>
+            }
+            ["updatePromptDraft"]: {
+                Args: Parameters<Stub["updatePromptDraft"]>
+                Result: Awaited<ReturnType<Stub["updatePromptDraft"]>>
             }
         }
         export interface Methods extends $MethodTypes {}
         /**
          * Types for a method's arguments and return value.
          * @example
-         * type Args = actors.Counter.Methods["increment"]["Args"]
-         * type Result = actors.Counter.Methods["increment"]["Result"]
+         * type Args = actors.Agent.Methods["acquirePromptLock"]["Args"]
+         * type Result = actors.Agent.Methods["acquirePromptLock"]["Result"]
          */
         export namespace Methods {
-            export namespace increment {
-                export type Args = $MethodTypes["increment"]["Args"]
-                export type Result = $MethodTypes["increment"]["Result"]
+            export namespace acquirePromptLock {
+                export type Args = $MethodTypes["acquirePromptLock"]["Args"]
+                export type Result = $MethodTypes["acquirePromptLock"]["Result"]
+            }
+            export namespace clearHistory {
+                export type Args = $MethodTypes["clearHistory"]["Args"]
+                export type Result = $MethodTypes["clearHistory"]["Result"]
+            }
+            export namespace configureTools {
+                export type Args = $MethodTypes["configureTools"]["Args"]
+                export type Result = $MethodTypes["configureTools"]["Result"]
+            }
+            export namespace connectUser {
+                export type Args = $MethodTypes["connectUser"]["Args"]
+                export type Result = $MethodTypes["connectUser"]["Result"]
+            }
+            export namespace disconnectUser {
+                export type Args = $MethodTypes["disconnectUser"]["Args"]
+                export type Result = $MethodTypes["disconnectUser"]["Result"]
+            }
+            export namespace executeTool {
+                export type Args = $MethodTypes["executeTool"]["Args"]
+                export type Result = $MethodTypes["executeTool"]["Result"]
+            }
+            export namespace getConnectedUsers {
+                export type Args = $MethodTypes["getConnectedUsers"]["Args"]
+                export type Result = $MethodTypes["getConnectedUsers"]["Result"]
+            }
+            export namespace getSnapshot {
+                export type Args = $MethodTypes["getSnapshot"]["Args"]
+                export type Result = $MethodTypes["getSnapshot"]["Result"]
+            }
+            export namespace getToolConfig {
+                export type Args = $MethodTypes["getToolConfig"]["Args"]
+                export type Result = $MethodTypes["getToolConfig"]["Result"]
+            }
+            export namespace heartbeatUser {
+                export type Args = $MethodTypes["heartbeatUser"]["Args"]
+                export type Result = $MethodTypes["heartbeatUser"]["Result"]
+            }
+            export namespace releasePromptLock {
+                export type Args = $MethodTypes["releasePromptLock"]["Args"]
+                export type Result = $MethodTypes["releasePromptLock"]["Result"]
+            }
+            export namespace sendPrompt {
+                export type Args = $MethodTypes["sendPrompt"]["Args"]
+                export type Result = $MethodTypes["sendPrompt"]["Result"]
+            }
+            export namespace updatePromptDraft {
+                export type Args = $MethodTypes["updatePromptDraft"]["Args"]
+                export type Result = $MethodTypes["updatePromptDraft"]["Result"]
             }
         }
     }
@@ -81,27 +541,41 @@ export declare namespace actors {
 /**
  * Call actor methods from your backend.
  * @example
- * const actor = actors.Counter.get("actor-id")
+ * const actor = actors.Agent.get("actor-id")
  */
 export const actors = {
-    ["Counter"]: {
-        get(actorId: string, transport?: ActorRpcTransport): actors.Counter.Stub {
-            return $createActorStub<actors.Counter.Stub>(
-                "Counter",
+    ["Agent"]: {
+        get(actorId: string, transport?: ActorRpcTransport): actors.Agent.Stub {
+            return $createActorStub<actors.Agent.Stub>(
+                "Agent",
                 actorId,
-                [{ name: "increment", result: "value" }],
+                [
+                    { name: "acquirePromptLock", result: "value" },
+                    { name: "clearHistory", result: "value" },
+                    { name: "configureTools", result: "value" },
+                    { name: "connectUser", result: "value" },
+                    { name: "disconnectUser", result: "void" },
+                    { name: "executeTool", result: "value" },
+                    { name: "getConnectedUsers", result: "value" },
+                    { name: "getSnapshot", result: "value" },
+                    { name: "getToolConfig", result: "value" },
+                    { name: "heartbeatUser", result: "void" },
+                    { name: "releasePromptLock", result: "void" },
+                    { name: "sendPrompt", result: "value" },
+                    { name: "updatePromptDraft", result: "value" }
+                ],
                 transport
             )
         },
         /**
          * Allow a frontend connection after your backend checks the user's access.
          * @example
-         * const grant = await actors.Counter.prepareWebsocket({ actorId: "actor-id", metadata })
+         * const grant = await actors.Agent.prepareWebsocket({ actorId: "actor-id", metadata })
          */
         prepareWebsocket(
-            authorization: { actorId: string; metadata: actors.Counter.Metadata; authorizationLifetimeMs?: number }
+            authorization: { actorId: string; metadata: actors.Agent.Metadata; authorizationLifetimeMs?: number }
         ): Promise<SocketGrant> {
-            return new ActorProxy().handle({ ...authorization, actorName: "Counter" })
+            return new ActorProxy().handle({ ...authorization, actorName: "Agent" })
         }
     }
 }
@@ -109,23 +583,23 @@ export const actors = {
 /**
  * The actor and connection details approved by your backend.
  * @example
- * const authorization: ActorAuthorization = { actorName: "Counter", actorId: "actor-id", metadata }
+ * const authorization: ActorAuthorization = { actorName: "Agent", actorId: "actor-id", metadata }
  */
-export type ActorAuthorization = actors.Counter.Authorization
+export type ActorAuthorization = actors.Agent.Authorization
 
 /**
  * Allow a frontend connection after your backend checks the user's access.
  * @example
- * const grant = await ActorProxy.handle({ actorName: "Counter", actorId: "actor-id", metadata })
+ * const grant = await ActorProxy.handle({ actorName: "Agent", actorId: "actor-id", metadata })
  */
 export class ActorProxy extends $SocketProxy<{
-    ["Counter"]: ProxyActor<actors.Counter.Metadata>
+    ["Agent"]: ProxyActor<actors.Agent.Metadata>
 }> {
     constructor(
         
     ) {
         super(
-            { ["Counter"]: {} as ProxyActor<actors.Counter.Metadata> }
+            { ["Agent"]: {} as ProxyActor<actors.Agent.Metadata> }
         )
     }
 

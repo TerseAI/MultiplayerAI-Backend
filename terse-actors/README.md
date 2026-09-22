@@ -4,31 +4,21 @@
 
 `sendPrompt()` is `@Reentrant`. New clients can connect and receive partial assistant history while generation continues. Use `getSnapshot()` for the same history, connected-users, composer-lock, and composer-draft events over RPC.
 
-## Local dependencies
+## Local development
 
-This checkout currently uses the unreleased SDK from `/private/tmp/terse-reentrant-sdk/packages/terse-sdk`, linked into `node_modules/terse-sdk`. The local runtime SDK comes from `../../little-durable-objects/sdk`. Reinstalling dependencies may replace the Terse SDK link; restore it with:
-
-```sh
-pnpm link /private/tmp/terse-reentrant-sdk/packages/terse-sdk
-```
-
-Build the runtime and SDK from `little-durable-objects` before starting the sample:
+From the parent repo directory, run:
 
 ```sh
-cargo build --locked
-pnpm --dir sdk build
+npm run dev:terse
 ```
 
-From this directory, copy `.env.example` to `.env`, set the provider credentials, and run the local Terse CLI:
+The launcher links the SDK from the neighboring `ai-product-owner` checkout and the runtime from `little-durable-objects`, builds them, sets the binary and connection environment variables, regenerates the gateway client, and starts both services. No global linking or `/private/tmp` worktree is needed.
 
-```sh
-DURABLE_OBJECT_BINARY="$PWD/../../little-durable-objects/target/debug/little-actors" \
-  node /private/tmp/terse-reentrant-sdk/packages/terse-cli/dist/index.js actor serve
-```
+Put provider credentials in `terse-actors/.env`, or reuse the existing `durable-object-starter/.dev.vars`. The launcher reads both. The app continues to use the gateway at `http://127.0.0.1:8790`.
 
 Connect via a socket grant for actor name `Agent`, with metadata `{ connectionId }` from `connectUser(name)`, or `{ connectionId: null }` for a read-only observer. A named user must acquire a composer lease before calling `sendPrompt(prompt, connectionId, leaseId, attachments, configuration)`. Heartbeats use the `heartbeatUser(connectionId)` RPC, matching the Durable Object.
 
-The neighboring Express gateway still targets Cloudflare. This change ports the actor; it does not switch that gateway or deploy anything.
+The Express gateway uses the Terse adapter when started through `npm run dev:terse`. The existing Cloudflare commands remain available.
 
 ## Verification
 

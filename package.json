@@ -14,7 +14,8 @@
     "check:worker": "durable-object-starter/node_modules/.bin/tsc --noEmit --project durable-object-starter/tsconfig.json",
     "check": "npm run check:gateway && npm run check:worker",
     "test": "npm --prefix server test && npm --prefix durable-object-starter test",
-    "deploy:worker": "npm --prefix durable-object-starter run deploy"
+    "deploy:worker": "npm --prefix durable-object-starter run deploy",
+    "dev:terse": "node scripts/dev-terse.mjs"
   },
   "license": "MIT"
 }
